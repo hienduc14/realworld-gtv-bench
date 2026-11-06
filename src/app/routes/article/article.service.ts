@@ -1,6 +1,7 @@
 import slugify from 'slugify';
 import prisma from '../../../prisma/prisma-client';
 import HttpException from '../../models/http-exception.model';
+import { validateCommentBody, validateTitle } from '../../utils/validation';
 import profileMapper from '../profile/profile.utils';
 import articleMapper from './article.mapper';
 import { Tag } from '../tag/tag.model';
@@ -175,6 +176,8 @@ export const createArticle = async (article: any, id: number) => {
     throw new HttpException(422, { errors: { body: ["can't be blank"] } });
   }
 
+  validateTitle(title);
+
   const slug = `${slugify(title)}-${id}`;
 
   const existingTitle = await prisma.article.findUnique({
@@ -314,6 +317,8 @@ export const updateArticle = async (article: any, slug: string, id: number) => {
   }
 
   if (article.title) {
+    validateTitle(article.title);
+
     newSlug = `${slugify(article.title)}-${id}`;
 
     if (newSlug !== slug) {
@@ -474,6 +479,8 @@ export const addComment = async (body: string, slug: string, id: number) => {
   if (!body) {
     throw new HttpException(422, { errors: { body: ["can't be blank"] } });
   }
+
+  validateCommentBody(body);
 
   const article = await prisma.article.findUnique({
     where: {
