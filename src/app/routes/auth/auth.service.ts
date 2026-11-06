@@ -77,7 +77,7 @@ export const createUser = async (input: RegisterInput): Promise<RegisteredUser> 
 
   return {
     ...user,
-    token: generateToken(user.id),
+    token: generateToken(user),
   };
 };
 
@@ -116,7 +116,7 @@ export const login = async (userPayload: any) => {
         username: user.username,
         bio: user.bio,
         image: user.image,
-        token: generateToken(user.id),
+        token: generateToken(user),
       };
     }
   }
@@ -144,7 +144,7 @@ export const getCurrentUser = async (id: number) => {
 
   return {
     ...user,
-    token: generateToken(user.id),
+    token: generateToken(user),
   };
 };
 
@@ -178,6 +178,6 @@ export const updateUser = async (userPayload: any, id: number) => {
 
   return {
     ...user,
-    token: generateToken(user.id),
+    token: generateToken(user),
   };
 };
