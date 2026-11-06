@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "gtv": {
+      "command": "node",
+      "args": [
+        "C:/Users/hienn/.gtv/bin/gtv.mjs",
+        "mcp",
+        "--agent",
+        "auto",
+        "--daemon",
+        "http://127.0.0.1:7391"
+      ]
+    }
+  }
+}
