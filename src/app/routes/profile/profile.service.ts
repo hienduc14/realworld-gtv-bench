@@ -13,7 +13,7 @@ export const getProfile = async (usernamePayload: string, id?: number) => {
   });
 
   if (!profile) {
-    throw new HttpException(404, {});
+    throw new HttpException(404, 'PROFILE_NOT_FOUND');
   }
 
   return profileMapper(profile, id);

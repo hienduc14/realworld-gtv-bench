@@ -26,11 +26,9 @@ const checkUserUniqueness = async (email: string, username: string) => {
   });
 
   if (existingUserByEmail || existingUserByUsername) {
-    throw new HttpException(422, {
-      errors: {
-        ...(existingUserByEmail ? { email: ['has already been taken'] } : {}),
-        ...(existingUserByUsername ? { username: ['has already been taken'] } : {}),
-      },
+    throw new HttpException(422, 'VALIDATION_FAILED', {
+      ...(existingUserByEmail ? { email: ['has already been taken'] } : {}),
+      ...(existingUserByUsername ? { username: ['has already been taken'] } : {}),
     });
   }
 };
@@ -42,15 +40,15 @@ export const createUser = async (input: RegisterInput): Promise<RegisteredUser> 
   const { image, bio, demo } = input;
 
   if (!email) {
-    throw new HttpException(422, { errors: { email: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { email: ["can't be blank"] });
   }
 
   if (!username) {
-    throw new HttpException(422, { errors: { username: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { username: ["can't be blank"] });
   }
 
   if (!password) {
-    throw new HttpException(422, { errors: { password: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { password: ["can't be blank"] });
   }
 
   await checkUserUniqueness(email, username);
@@ -86,11 +84,11 @@ export const login = async (userPayload: any) => {
   const password = userPayload.password?.trim();
 
   if (!email) {
-    throw new HttpException(422, { errors: { email: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { email: ["can't be blank"] });
   }
 
   if (!password) {
-    throw new HttpException(422, { errors: { password: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { password: ["can't be blank"] });
   }
 
   const user = await prisma.user.findUnique({
@@ -121,10 +119,8 @@ export const login = async (userPayload: any) => {
     }
   }
 
-  throw new HttpException(403, {
-    errors: {
-      'email or password': ['is invalid'],
-    },
+  throw new HttpException(403, 'INVALID_CREDENTIALS', {
+    'email or password': ['is invalid'],
   });
 };
 

@@ -164,15 +164,15 @@ export const createArticle = async (article: any, id: number) => {
   const tags = Array.isArray(tagList) ? tagList : [];
 
   if (!title) {
-    throw new HttpException(422, { errors: { title: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { title: ["can't be blank"] });
   }
 
   if (!description) {
-    throw new HttpException(422, { errors: { description: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { description: ["can't be blank"] });
   }
 
   if (!body) {
-    throw new HttpException(422, { errors: { body: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { body: ["can't be blank"] });
   }
 
   const slug = `${slugify(title)}-${id}`;
@@ -187,7 +187,7 @@ export const createArticle = async (article: any, id: number) => {
   });
 
   if (existingTitle) {
-    throw new HttpException(422, { errors: { title: ['must be unique'] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { title: ['must be unique'] });
   }
 
   const {
@@ -267,7 +267,7 @@ export const getArticle = async (slug: string, id?: number) => {
   });
 
   if (!article) {
-    throw new HttpException(404, { errors: { article: ['not found'] } });
+    throw new HttpException(404, 'ARTICLE_NOT_FOUND');
   }
 
   return articleMapper(article, id);
@@ -304,13 +304,11 @@ export const updateArticle = async (article: any, slug: string, id: number) => {
   });
 
   if (!existingArticle) {
-    throw new HttpException(404, {});
+    throw new HttpException(404, 'ARTICLE_NOT_FOUND');
   }
 
   if (existingArticle.author.id !== id) {
-    throw new HttpException(403, {
-      message: 'You are not authorized to update this article',
-    });
+    throw new HttpException(403, 'NOT_ARTICLE_AUTHOR');
   }
 
   if (article.title) {
@@ -327,7 +325,7 @@ export const updateArticle = async (article: any, slug: string, id: number) => {
       });
 
       if (existingTitle) {
-        throw new HttpException(422, { errors: { title: ['must be unique'] } });
+        throw new HttpException(422, 'VALIDATION_FAILED', { title: ['must be unique'] });
       }
     }
   }
@@ -398,13 +396,11 @@ export const deleteArticle = async (slug: string, id: number) => {
   });
 
   if (!existingArticle) {
-    throw new HttpException(404, {});
+    throw new HttpException(404, 'ARTICLE_NOT_FOUND');
   }
 
   if (existingArticle.author.id !== id) {
-    throw new HttpException(403, {
-      message: 'You are not authorized to delete this article',
-    });
+    throw new HttpException(403, 'NOT_ARTICLE_AUTHOR');
   }
   await prisma.article.delete({
     where: {
@@ -472,7 +468,7 @@ export const getCommentsByArticle = async (slug: string, id?: number) => {
 
 export const addComment = async (body: string, slug: string, id: number) => {
   if (!body) {
-    throw new HttpException(422, { errors: { body: ["can't be blank"] } });
+    throw new HttpException(422, 'VALIDATION_FAILED', { body: ["can't be blank"] });
   }
 
   const article = await prisma.article.findUnique({
@@ -543,13 +539,11 @@ export const deleteComment = async (id: number, userId: number) => {
   });
 
   if (!comment) {
-    throw new HttpException(404, {});
+    throw new HttpException(404, 'COMMENT_NOT_FOUND');
   }
 
   if (comment.author.id !== userId) {
-    throw new HttpException(403, {
-      message: 'You are not authorized to delete this comment',
-    });
+    throw new HttpException(403, 'NOT_COMMENT_AUTHOR');
   }
 
   await prisma.comment.delete({

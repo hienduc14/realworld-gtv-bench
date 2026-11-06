@@ -37,9 +37,10 @@ app.use(
         message: 'missing authorization credentials',
       });
       // @ts-ignore
-    } else if (err && err.errorCode) {
-      // @ts-ignore
-      res.status(err.errorCode).json(err.message);
+    } else if (err instanceof HttpException) {
+      res
+        .status(err.errorCode)
+        .json({ code: err.code, ...(err.details ? { errors: err.details } : {}) });
     } else if (err) {
       res.status(500).json(err.message);
     }
