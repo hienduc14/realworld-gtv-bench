@@ -4,6 +4,7 @@ import HttpException from '../../models/http-exception.model';
 import profileMapper from '../profile/profile.utils';
 import articleMapper from './article.mapper';
 import { Tag } from '../tag/tag.model';
+import { validateTitle, validateCommentBody } from '../../utils/validation';
 
 const buildFindAllQuery = (query: any, id: number | undefined) => {
   const queries: any = [];
@@ -167,6 +168,8 @@ export const createArticle = async (article: any, id: number) => {
     throw new HttpException(422, { errors: { title: ["can't be blank"] } });
   }
 
+  validateTitle(title);
+
   if (!description) {
     throw new HttpException(422, { errors: { description: ["can't be blank"] } });
   }
@@ -288,6 +291,10 @@ const disconnectArticlesTags = async (slug: string) => {
 
 export const updateArticle = async (article: any, slug: string, id: number) => {
   let newSlug = null;
+
+  if ('title' in article) {
+    validateTitle(article.title);
+  }
 
   const existingArticle = await await prisma.article.findFirst({
     where: {
@@ -474,6 +481,8 @@ export const addComment = async (body: string, slug: string, id: number) => {
   if (!body) {
     throw new HttpException(422, { errors: { body: ["can't be blank"] } });
   }
+
+  validateCommentBody(body);
 
   const article = await prisma.article.findUnique({
     where: {
